@@ -1,5 +1,6 @@
 # Match-iT
-Partial Mapping Approach for High-Resolution Spatial Transcriptomics
+Unbalanced Mapping Approach for High-Resolution Spatial Transcriptomics
+![Workflow](https://github.com/AminaLEM/Match-iT/blob/main/Algorithm.png)
 
 
 # Overview
