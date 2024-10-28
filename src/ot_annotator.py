@@ -203,7 +203,7 @@ class ot_annotator:
             corr_coefficient=0
         return corr_coefficient
 
-    def objective_fun(self, params, cost_matrix, q, p, aggregated_ref):
+    def objective_fun(self, params, cost_matrix, p,q, aggregated_ref):
         """
         Objective function for hyperparameter optimization using unbalanced Sinkhorn transport.
         
@@ -220,12 +220,12 @@ class ot_annotator:
         """
         corr = 0
         Ts, log = ot.unbalanced.sinkhorn_unbalanced(
-            q, p, cost_matrix.T, params['reg'],
+            p,q, cost_matrix, params['reg'],
             [params['reg_m_kl_1'], params['reg_m_kl_2']],
             method=params['method'], reg_type=params['reg_type'], log=True
         )
 
-        T = pd.DataFrame(Ts, index=self.atlas.obs.index, columns=aggregated_ref.obs.index)
+        T = pd.DataFrame(np.transpose(Ts), index=self.atlas.obs.index, columns=aggregated_ref.obs.index)
         X_pred = pd.DataFrame(aggregated_ref.X.T.dot(T.T).T)
         idx = np.where(np.isnan(X_pred[0]))[0]
         if len(idx) < X_pred.shape[0] - 1:
@@ -260,7 +260,7 @@ class ot_annotator:
 
 
         best_params = fmin(
-            fn=lambda params: self.objective_fun(params, cost_matrix, q, p, aggregated_ref),
+            fn=lambda params: self.objective_fun(params, cost_matrix, p,q, aggregated_ref),
             space=self.param_space,
             algo=tpe.suggest,
             max_evals=op_iter,

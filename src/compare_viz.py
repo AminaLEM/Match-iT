@@ -51,7 +51,10 @@ class compare_viz:
         if sample==True:
             X_pred_=X_pred_.T
             X_org_=X_org_.T
-        correlation_results = X_org_.corrwith(X_pred_, axis=0, numeric_only=True)
+        num_cols = X_org_.shape[1]
+        corr_matrix=np.corrcoef(X_org_,X_pred_, rowvar=False)
+        correlations = np.diagonal(corr_matrix[:num_cols, num_cols:])
+        correlation_results= pd.Series(correlations, index= X_org_.columns)
         mean_corr = correlation_results.mean()
         cos_sim = cosine_similarity(X_pred_.T, X_org_.T)
         cosine_results = np.diag(cos_sim)
