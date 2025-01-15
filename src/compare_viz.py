@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import seaborn as sns
 from sklearn.metrics.pairwise import cosine_similarity
+np.random.seed(42) 
 
 class compare_viz:
     def __init__(self, adata, adata_ref, key_ref):
@@ -23,20 +24,20 @@ class compare_viz:
 #         sc.pp.filter_cells(self.adata, min_genes=1)
 
 #         sc.pp.normalize_total(self.adata_ref, layer='counts')
-#         sc.pp.log1p(self.adata_ref, layer='counts')
+#         sc.pp.log1p(self.adata_ref)
         sc.pp.pca(self.adata_ref)
         sc.pp.neighbors(self.adata_ref)
         sc.tl.umap(self.adata_ref)
 
 #         sc.pp.normalize_total(self.adata, layer='counts')
-#         sc.pp.log1p(self.adata, layer='counts')
-        sc.pp.pca(self.adata)
-        sc.pp.neighbors(self.adata)
+#         sc.pp.log1p(self.adata)
+#         sc.pp.pca(self.adata)
+#         sc.pp.neighbors(self.adata)
 
     def ingest(self,ngh=15):
         self.preprocess_adata()
         b = np.array(list(map(len, self.adata_ref.obsp['distances'].tolil().rows)))
-        adata_ref_subset = self.adata_ref[np.where(b == ngh-1)[0]]
+        adata_ref_subset = self.adata_ref[np.where(b > 2)[0]]
         sc.pp.neighbors(adata_ref_subset, n_neighbors=ngh)
         sc.tl.ingest(self.adata, adata_ref_subset, obs=self.key_ref)
         
@@ -64,30 +65,30 @@ class compare_viz:
         print(f'mean correlation:{mean_corr}')
         print(f'mean ccosine:{mean_cos}')
 
-        # Set global font size for better readability
-        plt.rcParams.update({'font.size': 14})
+#         # Set global font size for better readability
+#         plt.rcParams.update({'font.size': 14})
 
-        # Plot the distribution of correlations
-        plt.figure(figsize=(12, 6))
-        sns.histplot(correlation_results, bins=20, kde=True, stat="density", color='skyblue', alpha=0.3)
-        plt.axvline(mean_corr, color='red', linestyle='dashed', linewidth=1)
-        plt.xlabel('Correlation', fontsize=16)
-        plt.ylabel('Density', fontsize=16)
-        plt.title('Correlation per Sample', fontsize=18)
-        plt.legend({'Mean': mean_corr}, fontsize=14)
-        plt.savefig('correlation_density_plot.pdf', format='pdf')
-        plt.show()
+#         # Plot the distribution of correlations
+#         plt.figure(figsize=(12, 6))
+#         sns.histplot(correlation_results, bins=20, kde=True, stat="density", color='skyblue', alpha=0.3)
+#         plt.axvline(mean_corr, color='red', linestyle='dashed', linewidth=1)
+#         plt.xlabel('Correlation', fontsize=16)
+#         plt.ylabel('Density', fontsize=16)
+#         plt.title('Correlation per Sample', fontsize=18)
+#         plt.legend({'Mean': mean_corr}, fontsize=14)
+#         plt.savefig('correlation_density_plot.pdf', format='pdf')
+#         plt.show()
 
-        # Plot the distribution of cosine similarities
-        plt.figure(figsize=(12, 6))
-        sns.histplot(cosine_results, bins=20, kde=True, stat="density", color='skyblue', alpha=0.3)
-        plt.axvline(mean_cos, color='red', linestyle='dashed', linewidth=1)
-        plt.xlabel('Cosine Similarity', fontsize=16)
-        plt.ylabel('Density', fontsize=16)
-        plt.title('Cosine Similarity per Sample', fontsize=18)
-        plt.legend({'Mean': mean_cos}, fontsize=14)
-        plt.savefig('cosine_density_plot.pdf', format='pdf')
-        plt.show()
+#         # Plot the distribution of cosine similarities
+#         plt.figure(figsize=(12, 6))
+#         sns.histplot(cosine_results, bins=20, kde=True, stat="density", color='skyblue', alpha=0.3)
+#         plt.axvline(mean_cos, color='red', linestyle='dashed', linewidth=1)
+#         plt.xlabel('Cosine Similarity', fontsize=16)
+#         plt.ylabel('Density', fontsize=16)
+#         plt.title('Cosine Similarity per Sample', fontsize=18)
+#         plt.legend({'Mean': mean_cos}, fontsize=14)
+#         plt.savefig('cosine_density_plot.pdf', format='pdf')
+#         plt.show()
         return correlation_results,cosine_results
 
 
